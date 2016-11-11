@@ -58,12 +58,13 @@ try:
 	gettext.gettext = _my_gettext
 
 	import argparse
-	from urllib.parse import urlparse
-	from bs4 import BeautifulSoup
 	import requests
 	import progressbar
-	from configparser import ConfigParser
 	import codecs
+	from urllib.parse import urlparse
+	from bs4 import BeautifulSoup
+	from configparser import ConfigParser
+	from tabulate import tabulate
 
 except ImportError as err:
 	modulename = err.args[0].partition("'")[-1].rpartition("'")[0]
@@ -81,8 +82,20 @@ def init_argparse():
 
 	opciones = {	"padron": {
 								"type": str,
+								"nargs": '?',
 								"action": "store",
 								"help": _("Padrón a descargar")
+					},
+					"--version -v": {
+								"action":	"version",
+								"version":	__version__,
+								"help":		_("Mostrar el número de versión y salir")
+					},
+					"--show-padrones -s": {
+								"action":	"store_true",
+								"dest":		"showpadrones",
+								"default":	False,
+								"help":		_("Verifciación completa. c: algoritmos de compresión, e: algoritmos de encriptación.")
 					}
 			}
 
@@ -102,7 +115,6 @@ def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	if domainoverride:
 		domain = domainoverride
-		print(domain)
 	else:
 		domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
 
@@ -118,23 +130,12 @@ def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	return url
 
-def download_file(url):
-	local_filename = url.split('/')[-1]
-	print("Descargando {0}...".format(local_filename))
-	# NOTE the stream=True parameter
-	r = requests.get(url, stream=True)
-	with open(local_filename, 'wb') as f:
-		for chunk in r.iter_content(chunk_size=1024):
-			if chunk: # filter out keep-alive new chunks
-				f.write(chunk)
-				#f.flush() commented by recommendation from J.F.Sebastian
-	return local_filename
-
 def download_file2(url):
 
 	local_filename = url.split('/')[-1]
 	chunk_size = 4096
 	with open(local_filename, "wb") as f:
+
 		print("Descargando {0}...".format(local_filename))
 		response = requests.get(url, stream=True)
 		total_length = response.headers.get('content-length')
@@ -152,7 +153,10 @@ def download_file2(url):
 				bar.update(i)
 				i+=1
 
+			bar.finish()
+
 	return local_filename
+
 
 def	Main():
 
@@ -162,37 +166,54 @@ def	Main():
 	except IOError as msg:
 		args.error(str(msg))
 
-
-	parser = ConfigParser()
-	parser.read_file(codecs.open("padrondl.cfg", "r", "utf8"))
+	config = ConfigParser()
+	config.read_file(codecs.open("padrondl.cfg", "r", "utf8"))
 
 	available_padrones=[]
 
-	for section_name in parser.sections():
-		# print('Section:', section_name)
-		# print('  Options:', parser.options(section_name))
+	for section_name in config.sections():
 
 		if "padron:" in section_name:
-			available_padrones.append(section_name.split(":")[1])
+			padron_id = section_name.split(":")[1]
+			padron_name = config[section_name]["name"]
+			available_padrones.append((padron_id,padron_name))
 
-		# for name, value in parser.items(section_name):
-		# 	print('  {} = {}'.format(name, value))
-		# print()
 
-	print(available_padrones)
+	if args.showpadrones:
 
-	"""
-	url		 = "http://www.agip.gob.ar/agentes/agentes-de-recaudacion-e-informacion"
-	hreftext = "Padrón de Regímenes Generales"
+		tablestr = tabulate(
+						tabular_data		= available_padrones,
+						headers				= ["Padrón", "Descripción" ],
+						tablefmt			= "psql",
+						stralign			= "left",
+						override_cols_align = ["right", "left"]
+			)
 
-	url		 = "http://www.afip.gob.ar/genericos/cInscripcion/archivoCompleto.asp"
-	hreftext = "Archivo condición tributaria sin denominación"
+		print(tablestr)
+		sys.exit(0)
 
-	fileurl = getUrl(url, hreftext, )
-	print("Found the URL: {0}".format(fileurl))
+	if args.padron:
 
-	download_file2(fileurl)
-	"""
+		padrones = [p for p in available_padrones if p[0] == args.padron or args.padron == "all"]
+
+		for p,n in padrones:
+
+			# name		= Condiciones tributarias - Sin denominación
+			# type		= href
+			# domain 	= http://www.afip.gob.ar/genericos/cInscripcion/
+			# url		= %(domain)s/archivoCompleto.asp
+			# hreftext 	= Archivo condición tributaria sin denominación
+
+			section		= "padron:" + p
+			tipo 		= config[section]["type"]
+			dominio 	= config[section]["domain"]
+			url 		= config[section]["url"]
+			hreftext	= config[section]["hreftext"]
+
+			if tipo == "href":
+				fileurl = get_UrlFromHref(url, hreftext, dominio)
+				if fileurl:
+					download_file2(fileurl)
 
 if __name__ == "__main__":
 
