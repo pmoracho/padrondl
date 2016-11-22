@@ -3,8 +3,7 @@ Padrondl
 
 * [Página del proyecto](https://pmoracho.github.io/padrondl)
 * [Proyecto en github](https://github.com/pmoracho/padrondl)
-* [Descarga de ejecutable para windows](None)
-
+* [Descarga de ejecutable para windows](https://github.com/pmoracho/padrondl/raw/master/dist/padrondl-20161122.zip)
 
 `Padrondl` es una herramienta de linea de comandos para descargar "padrones" de
 los organismos públicos. Los "padrones" son archivos en distintos formatos que
