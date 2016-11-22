@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Padrondl by pmoracho</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Padrondl</h1>
+      <h2 class="project-tagline">Special file downloader for &quot;Padrones&quot; file types</h2>
+      <a href="https://github.com/pmoracho/padrondl" class="btn">View on GitHub</a>
+      <a href="https://github.com/pmoracho/padrondl/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/pmoracho/padrondl/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="padrondl" class="anchor" href="#padrondl" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Padrondl</h1>
+
+<ul>
+<li><a href="https://pmoracho.github.io/padrondl">Página del proyecto</a></li>
+<li><a href="https://github.com/pmoracho/padrondl">Proyecto en github</a></li>
+<li><a href="None">Descarga de ejecutable para windows</a></li>
+</ul>
+
+<p><code>Padrondl</code> es una herramienta de linea de comandos para descargar "padrones" de
+los organismos públicos. Los "padrones" son archivos en distintos formatos que
+organismos públicos como ser el Afip o Agip publican en sus páginas con
+información importante sobre contribuyentes. Más allá de lo coemtado <code>padrondl</code>
+funciona como un "downloader" de archivos publicados en la web.</p>
+
+<p>A la fecha solo procesa archivos definidos en un tag <code>&lt;href&gt;</code>, más adelante
+iremos implementado en la medida de nuestras necesidades otros métodos para
+encontrar y descargar archivos desde un página web.</p>
+
+<p>La configuración de las decargas se realiza en un archivo de configuración 
+ubicado en la misma carpeta dónde se encuentra esta herramienta y que se
+denomina <code>padrondl.cfg</code>.</p>
+
+<p>Esta es la configuación actual</p>
+
+<pre><code>[general]
+outputpath  = c:\Tmp
+
+[padron:rgg]
+type        = href
+name        = Régimen general de ingresos brutos - CABA
+url         = http://www.agip.gob.ar/agentes/agentes-de-recaudacion-e-informacion
+hreftext    = Padrón de Regímenes Generales
+domain      = http://www.agip.gob.ar/
+
+[padron:cfsd]
+name        = Condiciones tributarias - Sin denominación
+type        = href
+domain      = http://www.afip.gob.ar/genericos/cInscripcion/
+url         = %(domain)s/archivoCompleto.asp
+hreftext    = Archivo condición tributaria sin denominación
+
+[padron:cfcd]
+name        = Condiciones tributarias - Con denominación
+type        = href
+domain      = http://www.afip.gob.ar/genericos/cInscripcion/
+url         = %(domain)s/archivoCompleto.asp
+hreftext    = Archivo condición tributaria con denominación
+</code></pre>
+
+<p>Como vemos, hay configurado tres padrones:</p>
+
+<ul>
+<li>AGIP - Régimen general de ingresos brutos - CABA</li>
+<li>AFIP - Condiciones tributarias - Sin denominación</li>
+<li>AFIP - Condiciones tributarias - Con denominación</li>
+</ul>
+
+<h1>
+<a id="detalle-de-la-configuración" class="anchor" href="#detalle-de-la-configuraci%C3%B3n" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Detalle de la configuración</h1>
+
+<ul>
+<li><p>Cada padrón tiene un  único que se configura como parte del nombre de la
+sección, por ejemplo <code>[padron:rgg]</code> define el  "rgg"</p></li>
+<li><p><code>name</code>: Es simplemente la descripción del padrón</p></li>
+<li><p><code>type</code>: Define el tipo de acces al archivo. Actualmente ya dijimos solo está
+habilitado el tipo "href" que indica un proceso dónde lo que se espera es que
+el link al archivo se encuenter asociado a una etiqueta <code>&lt;href&gt;</code></p></li>
+<li><p><code>domain</code>: Página inicial, en algunos casos el padrón se publica con una
+referencia relativa a esta página, por lo que en el enlace no tendremos la
+ruta completa, configurando este dato el proceso podrá componer la url exacta
+al archivo.</p></li>
+<li><p><code>url</code>: Página dónde se encuentra la refefencia al padrón</p></li>
+<li><p><code>hreftext</code>: Texto del enlace (puede ser parte del mismo) sirve para
+aseguraranos que el enlace es el correcto</p></li>
+</ul>
+
+<h1>
+<a id="algunos-puntos-claves-de-este-proyecto" class="anchor" href="#algunos-puntos-claves-de-este-proyecto" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Algunos puntos claves de este proyecto:</h1>
+
+<ul>
+<li>Herramienta de línea de comandos</li>
+<li>Descarga de archivos desde páginas web</li>
+<li>Configurable</li>
+</ul>
+
+<h1>
+<a id="requerimientos-e-instalación" class="anchor" href="#requerimientos-e-instalaci%C3%B3n" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requerimientos e instalación:</h1>
+
+<p>En Windows, nada en particular ya que se distribuye la herramienta "congelada"
+mediante <strong>Pyinstaller</strong>. Descargarla y copiarla en alguna carpeta del sistema,
+idealmente que esté apuntada al path.</p>
+
+<ul>
+<li>Para descargar y descomprimir <strong>Padrondl</strong>, hacer click
+<a href="None">aqui</a>
+</li>
+<li>El proyecto en <a href="https://github.com/pmoracho/padrondl"><strong>Github</strong></a>
+</li>
+</ul>
+
+<h1>
+<a id="ejemplos-de-uso" class="anchor" href="#ejemplos-de-uso" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ejemplos de Uso:</h1>
+
+<h2>
+<a id="invocación-sin-parámetros-o-con---help" class="anchor" href="#invocaci%C3%B3n-sin-par%C3%A1metros-o-con---help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Invocación sin parámetros o con `--help</h2>
+
+<pre><code>uso: padrondl [-h] [--show-padrones] [--version] [padron]
+
+Descarga de padrones (c) 2016, Patricio Moracho &lt;pmoracho@gmail.com&gt;
+
+argumentos posicionales:
+  padron               Padrón a descargar
+
+argumentos opcionales:
+  -h, --help           mostrar esta ayuda y salir
+  --show-padrones, -s  Verifciación completa. c: algoritmos de compresión, e:
+                       algoritmos de encriptación.
+  --version, -v        Mostrar el número de versión y salir
+
+</code></pre>
+
+<h2>
+<a id="padrondl--s" class="anchor" href="#padrondl--s" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>padrondl -s</code>
+</h2>
+
+<p>Listar los padrones habilitados para descarga</p>
+
+<pre><code>+----------+--------------------------------------------+
+|   Padrón | Descripción                                |
+|----------+--------------------------------------------|
+|      rgg | Régimen general de ingresos brutos - CABA  |
+|     cfsd | Condiciones tributarias - Sin denominación |
+|     cfcd | Condiciones tributarias - Con denominación |
++----------+--------------------------------------------+
+</code></pre>
+
+<h2>
+<a id="padrondl-rgg" class="anchor" href="#padrondl-rgg" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>padrondl rgg</code>
+</h2>
+
+<p>Descarga del padrón del régimen general de ingresos brutos</p>
+
+<pre><code>Descargando ARDJU008112016.rar...
+ 19% ( 761 of 3950) |###################################                                                                                                                                                   | Elapsed Time: 0:00:03 ETA: 0:00:15
+</code></pre>
+
+<h1>
+<a id="notas-para-el-desarrollador" class="anchor" href="#notas-para-el-desarrollador" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Notas para el desarrollador:</h1>
+
+<p>El proyecto <strong>padrondl</strong> esta construido usando el lenguaje <strong>python</strong>, a la
+fecha no se usan librerías adicionales a las propias de python, pero de todas
+formas es recomendable preparar antes que nada, un entorno de desarrollo. A
+continuación expondremos en detalle cuales son los pasos para tener preparado
+el entorno de desarrollo. Este detalle esta orientado a la implementación sobre
+Windows 32 bits, los pasos para versiones de 64 bits son sustancialmente
+distintos, en particular por algunos de los "paquetes" que se construyen a
+partir de módulos en C o C++, de igual forma la instalación sobre Linux tiene
+sus grandes diferencias. Eventualmente profundizaremos sobre estos entornos,
+pero en principio volvemos a señalar que el siguiente detalle aplica a los
+ambientes Windows de 32 bits:</p>
+
+<ul>
+<li><p>Obviamente en primer lugar necesitaremos
+<a href="https://www.python.org/ftp/python/3.4.0/python-3.4.0.msi">Python</a>, por ahora
+únicamente la versión 3.4. La correcta instalación se debe verificar desde la
+línea de comandos: <code>python --version</code>. Si todo se instaló correctamente se
+debe ver algo como esto <code>Python 3.4.0</code>, sino verificar que Python.exe se
+encuentre correctamente apuntado en el PATH.</p></li>
+<li><p>Es conveniente pero no mandatorio hacer upgrade de la herramienta pip:
+<code>python -m pip install --upgrade pip</code></p></li>
+<li><p><a href="https://virtualenv.pypa.io/en/stable/">Virutalenv</a>. Es la herramienta
+estándar para crear entornos "aislados" de python. Para no tener conflictos
+de desarrollo lo que haremos mediante esta herramienta es crear un "entorno
+virtual" de python en una carpeta del proyecto (venv). Este "entorno virtual"
+contendrá una copia completa de Python, al activarlo se modifica el PATH al
+python.exe que apuntará ahora a nuestra carpeta del entorno, evitando
+cualquier tipo de conflicto con un entorno Python ya existente. La
+instalación de virtualenv se hara mediante <code>pip install virtualenv</code></p></li>
+<li><p>Descargar el proyecto desde <a href="https://github.com/pmoracho/padrondl">Github</a>, se
+puede descargar desde la página el proyecto como un archivo Zip, o si
+contamos con <a href="https://git-for-windows.github.io/">Git</a> sencillamente haremos
+un <code>git clone https://github.com/pmoracho/parseit</code>.</p></li>
+<li>
+<p>Requerimientos adicionales:</p>
+
+<ul>
+<li>
+<strong>Pyinstaller</strong>, para generar la distribución binaria <code>pip install pyinstaller</code>
+</li>
+<li>
+<strong>Requests</strong> --&gt; <code>pip install requests</code>
+</li>
+<li>
+<strong>BeautifulSoup</strong> --&gt; <code>pip install beautifulsoup4</code>
+</li>
+<li>
+<strong>Progressbar</strong> --&gt; <code>pip install progressbar2</code>
+</li>
+</ul>
+</li>
+</ul>
+
+<h1>
+<a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Changelog:</h1>
+
+<h4>
+<a id="version-10---2016-11-22" class="anchor" href="#version-10---2016-11-22" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Version 1.0 - 2016-11-22</h4>
+
+<ul>
+<li>Primera versión</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/pmoracho/padrondl">Padrondl</a> is maintained by <a href="https://github.com/pmoracho">pmoracho</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
