@@ -130,6 +130,18 @@ def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	return url
 
+def show_padrones(available_padrones):
+
+	tablestr = tabulate(
+					tabular_data		= available_padrones,
+					headers				= ["Padrón", "Descripción" ],
+					tablefmt			= "psql",
+					stralign			= "left",
+					override_cols_align = ["right", "left"]
+		)
+
+	print(tablestr)
+
 def download_file2(url):
 
 	local_filename = url.split('/')[-1]
@@ -179,17 +191,8 @@ def	Main():
 			available_padrones.append((padron_id,padron_name))
 
 
-	if args.showpadrones:
-
-		tablestr = tabulate(
-						tabular_data		= available_padrones,
-						headers				= ["Padrón", "Descripción" ],
-						tablefmt			= "psql",
-						stralign			= "left",
-						override_cols_align = ["right", "left"]
-			)
-
-		print(tablestr)
+	if args.showpadrones and available_padrones:
+		show_padrones(available_padrones)
 		sys.exit(0)
 
 	if args.padron:
@@ -214,6 +217,9 @@ def	Main():
 				fileurl = get_UrlFromHref(url, hreftext, dominio)
 				if fileurl:
 					download_file2(fileurl)
+
+	else:
+		cmdparser.print_help()
 
 if __name__ == "__main__":
 
