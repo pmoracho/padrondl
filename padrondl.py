@@ -110,8 +110,14 @@ def init_argparse():
 								"dest": 	"outputpath",
 								"default":	None,
 								"help":		_("Carpeta de outputh del padrón descargado.")
-
-					}
+					},
+					"--log-level -n": {
+								"type": 	str,
+								"action": 	"store",
+								"dest": 	"loglevel",
+								"default":	"info",
+								"help":		_("Nivel de log")
+					},
 			}
 
 	for key, val in opciones.items():
@@ -121,6 +127,9 @@ def init_argparse():
 		cmdparser.add_argument(*args, **kwargs)
 
 	return cmdparser
+
+def loginfo(msg):
+	logging.info(msg.replace("|", " "))
 
 
 def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
@@ -182,9 +191,9 @@ def normalizefn(text, delim='-'):
 
 def download_file(url, filemask=None, outputfile=None):
 
-	logging.info("Start downloading file")
-	logging.info("Download url: {0}".format(url))
-	logging.info("Filemask: {0}".format(filemask))
+	loginfo("Start downloading file")
+	loginfo("Download url: {0}".format(url))
+	loginfo("Filemask: {0}".format(filemask))
 
 	local_filename = url.split('/')[-1]
 
@@ -220,11 +229,23 @@ def download_file(url, filemask=None, outputfile=None):
 
 			bar.finish()
 
-	logging.info("Local file: {0}".format(local_filename))
-	logging.info("Download succesful!")
+	loginfo("Local file: {0}".format(local_filename))
+	loginfo("Download succesful!")
 
 	return local_filename
 
+def flag_process(outputpath, padron, ok):
+
+	try:
+		for status in ["ok", "error"]:
+			filename = os.path.join(outputpath, "{}.{}".format(padron, status))
+			os.remove(filename)
+	except FileNotFoundError:
+		pass
+
+	filename = os.path.join(outputpath, "{}.{}".format(padron, "ok" if ok else "error"))
+	file = open(filename,'w')
+	file.close()
 
 def Main():
 
@@ -236,12 +257,16 @@ def Main():
 		args.error(str(msg))
 
 	if args.outputpath:
-		logfile = os.path.join(args.outputpath, 'padrondl.log')
+		outputpath = args.outputpath
 	else:
-		logfile = 'padrondl.log'
+		outputpath = ''
 
-	logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%Y/%m/%d %I:%M:%S', filemode='w')
+	logfile = os.path.join(outputpath, 'padrondl.log')
+	log_level = getattr(logging, args.loglevel.upper(), None)
+	logging.basicConfig(filename=logfile, level=log_level, format='%(asctime)s|%(levelname)s|%(message)s', datefmt='%Y/%m/%d %I:%M:%S', filemode='w')
 
+	cfgfile = "padrondl.cfg"
+	loginfo("Loaing config: {}".format(cfgfile))
 	config = ConfigParser()
 	config.read_file(codecs.open("padrondl.cfg", "r", "utf8"))
 
@@ -264,6 +289,8 @@ def Main():
 
 		for p, n in padrones:
 
+			loginfo("Padron: {}".format(p))
+
 			# name		= Condiciones tributarias - Sin denominación
 			# type		= href
 			# domain 	= http://www.afip.gob.ar/genericos/cInscripcion/
@@ -277,7 +304,7 @@ def Main():
 			hreftext	= config[section]["hreftext"]
 			filemask	= config[section]["filemask"]
 
-			logging.info("get url: {} | {} | {}".format(url, hreftext, dominio))
+			loginfo("get url: {} - {} - {}".format(url, hreftext, dominio))
 			if tipo == "href":
 				fileurl = get_UrlFromHref(url, hreftext, dominio)
 			else:
@@ -285,10 +312,12 @@ def Main():
 
 			if fileurl:
 				try:
-					download_file(fileurl, filemask, args.outputpath)
+					download_file(fileurl, filemask, outputpath)
+					flag_process(outputpath, p, "ok")
+
 				except Exception as e:
 					logging.error("%s error: %s" % (__appname__, str(e)))
-
+					flag_process(outputpath, p, "error")
 	else:
 		cmdparser.print_help()
 
