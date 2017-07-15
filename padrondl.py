@@ -61,15 +61,22 @@ try:
 	import requests
 	import progressbar
 	import codecs
+	import re
+	import os
+	import logging
 	from urllib.parse import urlparse
 	from bs4 import BeautifulSoup
 	from configparser import ConfigParser
 	from tabulate import tabulate
+	from unicodedata import normalize
+
 
 except ImportError as err:
 	modulename = err.args[0].partition("'")[-1].rpartition("'")[0]
 	print(_("No fue posible importar el modulo: %s") % modulename)
 	sys.exit(-1)
+
+_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.:]+')
 
 def init_argparse():
 	"""Inicializar parametros del programa."""
@@ -96,6 +103,14 @@ def init_argparse():
 								"dest":		"showpadrones",
 								"default":	False,
 								"help":		_("Verifciación completa. c: algoritmos de compresión, e: algoritmos de encriptación.")
+					},
+					"--output-path -o": {
+								"type": 	str,
+								"action": 	"store",
+								"dest": 	"outputpath",
+								"default":	None,
+								"help":		_("Carpeta de outputh del padrón descargado.")
+
 					}
 			}
 
@@ -107,10 +122,10 @@ def init_argparse():
 
 	return cmdparser
 
+
 def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	response = requests.get(pageurl)
-
 	parsed_uri = urlparse(pageurl)
 
 	if domainoverride:
@@ -130,6 +145,7 @@ def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	return url
 
+
 def show_padrones(available_padrones):
 
 	tablestr = tabulate(
@@ -142,9 +158,46 @@ def show_padrones(available_padrones):
 
 	print(tablestr)
 
-def download_file2(url):
+
+def normalizefn(text, delim='-'):
+	"""Normaliza una cadena para ser usada como nombre de archivo.
+
+	Args:
+		text (str): String a normalizar
+		delim (str): Caracter de reemplazo de aquellos no vÃ¡lidos
+
+	Ejemplo:
+		>>> from openerm.Utils import *
+		>>> Start downloading file("Esto, no es vÃ¡lido como nombre de Archivo!", "-")
+		'esto-no-es-valido-como-nombre-de-archivo'
+	"""
+	result = []
+	for word in _punct_re.split(text):
+		word = normalize('NFKD', word).encode('ascii', 'ignore')
+		word = word.decode('utf-8')
+		if word:
+			result.append(word)
+	return delim.join(result)
+
+
+def download_file(url, filemask=None, outputfile=None):
+
+	logging.info("Start downloading file")
+	logging.info("Download url: {0}".format(url))
+	logging.info("Filemask: {0}".format(filemask))
 
 	local_filename = url.split('/')[-1]
+
+	if filemask:
+		result = re.match(filemask, local_filename)
+		local_filename = normalizefn(result.group(0))
+
+	if outputfile:
+		local_filename = os.path.join(outputfile, local_filename)
+
+	# Verificar filemask
+	# si es valida  descargar sino salir
+
 	chunk_size = 4096
 	with open(local_filename, "wb") as f:
 
@@ -152,7 +205,7 @@ def download_file2(url):
 		response = requests.get(url, stream=True)
 		total_length = response.headers.get('content-length')
 
-		if total_length is None: # no content length header
+		if total_length is None:  # no content length header
 			f.write(response.content)
 		else:
 			total_length = int(total_length)
@@ -163,33 +216,43 @@ def download_file2(url):
 			for data in response.iter_content(chunk_size=chunk_size):
 				f.write(data)
 				bar.update(i)
-				i+=1
+				i += 1
 
 			bar.finish()
+
+	logging.info("Local file: {0}".format(local_filename))
+	logging.info("Download succesful!")
 
 	return local_filename
 
 
-def	Main():
+def Main():
 
 	cmdparser = init_argparse()
+
 	try:
 		args = cmdparser.parse_args()
 	except IOError as msg:
 		args.error(str(msg))
 
+	if args.outputpath:
+		logfile = os.path.join(args.outputpath, 'padrondl.log')
+	else:
+		logfile = 'padrondl.log'
+
+	logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%Y/%m/%d %I:%M:%S', filemode='w')
+
 	config = ConfigParser()
 	config.read_file(codecs.open("padrondl.cfg", "r", "utf8"))
 
-	available_padrones=[]
+	available_padrones = []
 
 	for section_name in config.sections():
 
 		if "padron:" in section_name:
 			padron_id = section_name.split(":")[1]
 			padron_name = config[section_name]["name"]
-			available_padrones.append((padron_id,padron_name))
-
+			available_padrones.append((padron_id, padron_name))
 
 	if args.showpadrones and available_padrones:
 		show_padrones(available_padrones)
@@ -199,7 +262,7 @@ def	Main():
 
 		padrones = [p for p in available_padrones if p[0] == args.padron or args.padron == "all"]
 
-		for p,n in padrones:
+		for p, n in padrones:
 
 			# name		= Condiciones tributarias - Sin denominación
 			# type		= href
@@ -212,11 +275,19 @@ def	Main():
 			dominio 	= config[section]["domain"]
 			url 		= config[section]["url"]
 			hreftext	= config[section]["hreftext"]
+			filemask	= config[section]["filemask"]
 
+			logging.info("get url: {} | {} | {}".format(url, hreftext, dominio))
 			if tipo == "href":
 				fileurl = get_UrlFromHref(url, hreftext, dominio)
-				if fileurl:
-					download_file2(fileurl)
+			else:
+				fileurl = url
+
+			if fileurl:
+				try:
+					download_file(fileurl, filemask, args.outputpath)
+				except Exception as e:
+					logging.error("%s error: %s" % (__appname__, str(e)))
 
 	else:
 		cmdparser.print_help()
