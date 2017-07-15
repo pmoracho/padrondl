@@ -234,18 +234,35 @@ def download_file(url, filemask=None, outputfile=None):
 
 	return local_filename
 
-def flag_process(outputpath, padron, ok):
 
-	try:
-		for status in ["ok", "error"]:
-			filename = os.path.join(outputpath, "{}.{}".format(padron, status))
-			os.remove(filename)
-	except FileNotFoundError:
-		pass
+class ProcessFlag():
 
-	filename = os.path.join(outputpath, "{}.{}".format(padron, "ok" if ok else "error"))
-	file = open(filename,'w')
-	file.close()
+	def __init__(self, padron, outputpath):
+		self.padron = padron
+		self.outputpath = outputpath
+		self._remove_files()
+
+	def _remove_files(self):
+
+		try:
+			for status in ["ok", "error"]:
+				filename = os.path.join(self.outputpath, "{}.{}".format(self.padron, status))
+				os.remove(filename)
+
+		except FileNotFoundError:
+			pass
+
+	def flag(self, ok):
+
+		filename = os.path.join(self.outputpath, "{}.{}".format(self.padron, "ok" if ok else "error"))
+		file = open(filename, 'w')
+		file.close()
+
+	def ok(self):
+		self.flag(True)
+
+	def error(self):
+		self.flag(False)
 
 def Main():
 
@@ -291,6 +308,8 @@ def Main():
 
 			loginfo("Padron: {}".format(p))
 
+			pf = ProcessFlag(p, outputpath)
+
 			# name		= Condiciones tributarias - Sin denominación
 			# type		= href
 			# domain 	= http://www.afip.gob.ar/genericos/cInscripcion/
@@ -313,11 +332,10 @@ def Main():
 			if fileurl:
 				try:
 					download_file(fileurl, filemask, outputpath)
-					flag_process(outputpath, p, "ok")
-
+					pf.ok()
 				except Exception as e:
 					logging.error("%s error: %s" % (__appname__, str(e)))
-					flag_process(outputpath, p, "error")
+					pf.error()
 	else:
 		cmdparser.print_help()
 
