@@ -7,13 +7,15 @@ Padrondl
 
 `Padrondl` es una herramienta de linea de comandos para descargar "padrones" de
 los organismos públicos. Los "padrones" son archivos en distintos formatos que
-organismos públicos como ser el Afip o Agip publican en sus páginas con
-información importante sobre contribuyentes. Más allá de lo coemtado `padrondl`
-funciona como un "downloader" de archivos publicados en la web.
+organismos públicos como ser el [Afip](https://www.afip.gov.ar) o
+[Agip](https://www.agip.gov.ar) publican en sus páginas con información
+importante sobre contribuyentes. Más allá de lo comentado `padrondl` funciona
+como un "downloader" de archivos publicados en la web.
 
-A la fecha solo procesa archivos definidos en un tag `<href>`, más adelante
-iremos implementado en la medida de nuestras necesidades otros métodos para
-encontrar y descargar archivos desde un página web.
+A la fecha solo procesa archivos definidos en un tag `<href>` o mediante un
+link directo, más adelante iremos implementado en la medida de nuestras
+necesidades otros métodos para encontrar y descargar archivos desde un página
+web.
 
 La configuración de las decargas se realiza en un archivo de configuración 
 ubicado en la misma carpeta dónde se encuentra esta herramienta y que se
@@ -22,15 +24,13 @@ denomina `padrondl.cfg`.
 Esta es la configuación actual
 
 ```
-[general]
-outputpath	= c:\Tmp
-
 [padron:rgg]
 type		= href
 name		= Régimen general de ingresos brutos - CABA
 url 		= http://www.agip.gob.ar/agentes/agentes-de-recaudacion-e-informacion
-hreftext 	= Padrón de Regímenes Generales
+hreftext 	= Padrón de Regímenes Generales - Vigencia
 domain 		= http://www.agip.gob.ar/
+filemask	= ^\w*.rar
 
 [padron:cfsd]
 name		= Condiciones tributarias - Sin denominación
@@ -38,6 +38,7 @@ type		= href
 domain 		= http://www.afip.gob.ar/genericos/cInscripcion/
 url		 	= %(domain)s/archivoCompleto.asp
 hreftext 	= Archivo condición tributaria sin denominación
+filemask	=
 
 [padron:cfcd]
 name		= Condiciones tributarias - Con denominación
@@ -45,13 +46,23 @@ type		= href
 domain 		= http://www.afip.gob.ar/genericos/cInscripcion/
 url		 	= %(domain)s/archivoCompleto.asp
 hreftext 	= Archivo condición tributaria con denominación
+filemask	=
+
+[padron:2226]
+name		= Certificados de Exclusión Ret/Percep del Impuesto al Valor Agregado 
+type		= link
+domain 		= https://www.afip.gob.ar/genericos/rg17/
+url		 	= https://www.afip.gob.ar/genericos/rg17/archivos/rg17.zip
+hreftext 	= Transferencia del archivo completo - Resolución General 2226
+filemask	=
 ```
 
-Como vemos, hay configurado tres padrones:
+Como vemos, hay configurado cuatro padrones:
 
 * AGIP - Régimen general de ingresos brutos - CABA
 * AFIP - Condiciones tributarias - Sin denominación
 * AFIP - Condiciones tributarias - Con denominación
+* AFIP - Certificados de Exclusión Ret/Percep del Impuesto al Valor Agregado
 
 # Detalle de la configuración
 
@@ -60,9 +71,10 @@ Como vemos, hay configurado tres padrones:
 
 * `name`: Es simplemente la descripción del padrón
 
-* `type`: Define el tipo de acces al archivo. Actualmente ya dijimos solo está
-  habilitado el tipo "href" que indica un proceso dónde lo que se espera es que
-  el link al archivo se encuenter asociado a una etiqueta `<href>`
+* `type`: Define el tipo de acceso al archivo. Actualmente ya dijimos solo está
+  habilitado el tipo "href" y "link" que indica un proceso dónde lo que se
+  espera es que el link al archivo se encuenter asociado a una etiqueta
+  `<href>` o sea un enlace directo.
 
 * `domain`: Página inicial, en algunos casos el padrón se publica con una
   referencia relativa a esta página, por lo que en el enlace no tendremos la
@@ -97,19 +109,25 @@ idealmente que esté apuntada al path.
 ## Invocación sin parámetros o con `--help
 
 ```
-uso: padrondl [-h] [--show-padrones] [--version] [padron]
+uso: padrondl [-h] [--version] [--show-padrones] [--log-level LOGLEVEL]
+              [--output-path OUTPUTPATH]
+              [padron]
 
 Descarga de padrones (c) 2016, Patricio Moracho <pmoracho@gmail.com>
 
 argumentos posicionales:
-  padron               Padrón a descargar
+  padron                                   Padrón a descargar
 
 argumentos opcionales:
-  -h, --help           mostrar esta ayuda y salir
-  --show-padrones, -s  Verifciación completa. c: algoritmos de compresión, e:
-                       algoritmos de encriptación.
-  --version, -v        Mostrar el número de versión y salir
-
+  -h, --help                               mostrar esta ayuda y salir
+  --version, -v                            Mostrar el número de versión y
+                                           salir
+  --show-padrones, -s                      Verifciación completa. c:
+                                           algoritmos de compresión, e:
+                                           algoritmos de encriptación.
+  --log-level LOGLEVEL, -n LOGLEVEL        Nivel de log
+  --output-path OUTPUTPATH, -o OUTPUTPATH  Carpeta de outputh del padrón
+                                           descargado.
 ```
 
 ## `padrondl -s` 
@@ -117,13 +135,14 @@ argumentos opcionales:
 Listar los padrones habilitados para descarga
 
 ```
-+----------+--------------------------------------------+
-|   Padrón | Descripción                                |
-|----------+--------------------------------------------|
-|      rgg | Régimen general de ingresos brutos - CABA  |
-|     cfsd | Condiciones tributarias - Sin denominación |
-|     cfcd | Condiciones tributarias - Con denominación |
-+----------+--------------------------------------------+
++----------+---------------------------------------------------------------------+
+|   Padrón | Descripción                                                         |
+|----------+---------------------------------------------------------------------|
+|      rgg | Régimen general de ingresos brutos - CABA                           |
+|     cfsd | Condiciones tributarias - Sin denominación                          |
+|     cfcd | Condiciones tributarias - Con denominación                          |
+|     2226 | Certificados de Exclusión Ret/Percep del Impuesto al Valor Agregado |
++----------+---------------------------------------------------------------------+
 ```
 
 ## `padrondl rgg`
@@ -180,9 +199,15 @@ ambientes Windows de 32 bits:
 	* **BeautifulSoup** --> `pip install beautifulsoup4`
 	* **Progressbar** --> `pip install progressbar2`
 
-
+	Se puede instalar todo lo necesario mediante: `pip insatall -r requirements.txt`
 
 # Changelog:
+
+#### Version 1.1 - 2017-07-16
+* Descarga por link directo
+* Output path configurable medainte parámetro `--output-path -o`
+* Log 
+* Generación de "Flag File" por padrón.
 
 #### Version 1.0 - 2016-11-22
 * Primera versión
