@@ -281,11 +281,25 @@ def Main():
 	logfile = os.path.join(outputpath, 'padrondl.log')
 	log_level = getattr(logging, args.loglevel.upper(), None)
 	logging.basicConfig(filename=logfile, level=log_level, format='%(asctime)s|%(levelname)s|%(message)s', datefmt='%Y/%m/%d %I:%M:%S', filemode='w')
+	logging.info("Starting {0} - {1} (v{2})".format(__appname__, __appdesc__, __version__))
 
-	cfgfile = "padrondl.cfg"
-	loginfo("Loaing config: {}".format(cfgfile))
+	# determine if application is a script file or frozen exe
+	if getattr(sys, 'frozen', False):
+		application_path = os.path.dirname(sys.executable)
+	elif __file__:
+		application_path = os.path.dirname(__file__)
+
+	cfgfile = os.path.join(application_path, 'padrondl.cfg')
+
+	loginfo("Loading config: {}".format(cfgfile))
 	config = ConfigParser()
-	config.read_file(codecs.open("padrondl.cfg", "r", "utf8"))
+	try:
+		config.read_file(codecs.open(cfgfile, "r", "utf8"))
+	except FileNotFoundError:
+		errormsg = "No existe el archivo de configuración ({0})".format(cfgfile)
+		print(errormsg)
+		logging.error(errormsg)
+		sys.exit(-1)
 
 	available_padrones = []
 
@@ -334,7 +348,7 @@ def Main():
 					download_file(fileurl, filemask, outputpath)
 					pf.ok()
 				except Exception as e:
-					logging.error("%s error: %s" % (__appname__, str(e)))
+					logging.error(str(e))
 					pf.error()
 	else:
 		cmdparser.print_help()
