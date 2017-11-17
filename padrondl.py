@@ -78,6 +78,7 @@ except ImportError as err:
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.:]+')
 
+
 def init_argparse():
 	"""Inicializar parametros del programa."""
 	cmdparser = argparse.ArgumentParser(prog=__appname__,
@@ -118,6 +119,12 @@ def init_argparse():
 								"default":	"info",
 								"help":		_("Nivel de log")
 					},
+					"--quiet -q": {
+								"action": 	"store_true",
+								"dest": 	"quiet",
+								"default":	False,
+								"help":		_("Modo silencioso sin mostrar barra de progreso.")
+					},
 			}
 
 	for key, val in opciones.items():
@@ -127,6 +134,7 @@ def init_argparse():
 		cmdparser.add_argument(*args, **kwargs)
 
 	return cmdparser
+
 
 def loginfo(msg):
 	logging.info(msg.replace("|", " "))
@@ -189,7 +197,7 @@ def normalizefn(text, delim='-'):
 	return delim.join(result)
 
 
-def download_file(url, filemask=None, outputfile=None):
+def download_file(url, filemask=None, outputfile=None, quiet=False):
 
 	loginfo("Start downloading file")
 	loginfo("Download url: {0}".format(url))
@@ -210,7 +218,9 @@ def download_file(url, filemask=None, outputfile=None):
 	chunk_size = 4096
 	with open(local_filename, "wb") as f:
 
-		print("Descargando {0}...".format(local_filename))
+		if not quiet:
+			print("Download {0}...".format(local_filename))
+
 		response = requests.get(url, stream=True)
 		total_length = response.headers.get('content-length')
 
@@ -220,17 +230,20 @@ def download_file(url, filemask=None, outputfile=None):
 			total_length = int(total_length)
 
 			num_bars = total_length / chunk_size
-			bar = progressbar.ProgressBar(maxval=num_bars).start()
+			if not quiet:
+				bar = progressbar.ProgressBar(maxval=num_bars).start()
 			i = 0
 			for data in response.iter_content(chunk_size=chunk_size):
 				f.write(data)
-				bar.update(i)
+				if not quiet:
+					bar.update(i)
 				i += 1
 
-			bar.finish()
+			if not quiet:
+				bar.finish()
 
 	loginfo("Local file: {0}".format(local_filename))
-	loginfo("Download succesful!")
+	loginfo("Download successful!")
 
 	return local_filename
 
@@ -345,7 +358,7 @@ def Main():
 
 			if fileurl:
 				try:
-					download_file(fileurl, filemask, outputpath)
+					download_file(fileurl, filemask, outputpath, args.quiet)
 					pf.ok()
 				except Exception as e:
 					logging.error(str(e))
