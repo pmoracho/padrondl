@@ -67,7 +67,7 @@ try:
 	from urllib.parse import urlparse
 	from bs4 import BeautifulSoup
 	from configparser import ConfigParser
-	from tabulate import tabulate
+	from padrondl.tabulate import tabulate
 	from unicodedata import normalize
 
 
@@ -277,7 +277,7 @@ class ProcessFlag():
 	def error(self):
 		self.flag(False)
 
-def Main():
+def main():
 
 	cmdparser = init_argparse()
 
@@ -368,4 +368,4 @@ def Main():
 
 if __name__ == "__main__":
 
-	Main()
+	main()

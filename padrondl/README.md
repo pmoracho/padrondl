@@ -17,11 +17,11 @@ link directo, más adelante iremos implementado en la medida de nuestras
 necesidades otros métodos para encontrar y descargar archivos desde un página
 web.
 
-La configuración de las decargas se realiza en un archivo de configuración
+La configuración de las descargas se realiza en un archivo de configuración
 ubicado en la misma carpeta dónde se encuentra esta herramienta y que se
 denomina `padrondl.cfg`.
 
-Esta es la configuación actual
+Esta es la configuración actual:
 
 ```
 [padron:rgg]
@@ -57,7 +57,7 @@ hreftext 	= Transferencia del archivo completo - Resolución General 2226
 filemask	=
 ```
 
-Como vemos, hay configurado cuatro padrones:
+Como vemos, hay configurados cuatro padrones:
 
 * AGIP - Régimen general de ingresos brutos - CABA
 * AFIP - Condiciones tributarias - Sin denominación
@@ -73,7 +73,7 @@ Como vemos, hay configurado cuatro padrones:
 
 * `type`: Define el tipo de acceso al archivo. Actualmente ya dijimos solo está
   habilitado el tipo "href" y "link" que indica un proceso dónde lo que se
-  espera es que el link al archivo se encuenter asociado a una etiqueta
+  espera es que el link al archivo se encuentre asociado a una etiqueta
   `<href>` o sea un enlace directo.
 
 * `domain`: Página inicial, en algunos casos el padrón se publica con una
@@ -81,10 +81,10 @@ Como vemos, hay configurado cuatro padrones:
   ruta completa, configurando este dato el proceso podrá componer la url exacta
   al archivo.
 
-* `url`: Página dónde se encuentra la refefencia al padrón
+* `url`: Página dónde se encuentra la referencia al padrón
 
 * `hreftext`: Texto del enlace (puede ser parte del mismo) sirve para
-  aseguraranos que el enlace es el correcto
+  asegurarnos que el enlace es el correcto
 
 
 # Algunos puntos claves de este proyecto:
@@ -94,6 +94,12 @@ Como vemos, hay configurado cuatro padrones:
 * Configurable
 
 # Requerimientos e instalación:
+
+## "The standar way"
+
+La forma tradicional y estándar de descarga e instalación de un paquete de python.
+
+## Para windows solamente
 
 En Windows, nada en particular ya que se distribuye la herramienta "congelada"
 mediante **Pyinstaller**. Descargarla y copiarla en alguna carpeta del sistema,
@@ -106,7 +112,7 @@ idealmente que esté apuntada al path.
 
 # Ejemplos de Uso:
 
-## Invocación sin parámetros o con `--help
+## Invocación sin parámetros o con `--help`
 
 ```
 uso: padrondl [-h] [--version] [--show-padrones] [--log-level LOGLEVEL]
@@ -203,6 +209,9 @@ ambientes Windows de 32 bits:
 
 # Changelog:
 
+#### Version 1.2 - 2020-09-01
+* Implementación del mecanismo estándar de deploy
+
 #### Version 1.1 - 2017-07-16
 * Descarga por link directo
 * Output path configurable medainte parámetro `--output-path -o`
@@ -211,4 +220,3 @@ ambientes Windows de 32 bits:
 
 #### Version 1.0 - 2016-11-22
 * Primera versión
-
