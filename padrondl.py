@@ -229,7 +229,7 @@ def download_file(url, filemask=None, outputfile=None, quiet=False):
 		else:
 			total_length = int(total_length)
 
-			num_bars = total_length / chunk_size
+			num_bars = total_length
 			if not quiet:
 				bar = progressbar.ProgressBar(maxval=num_bars).start()
 			i = 0
@@ -237,7 +237,7 @@ def download_file(url, filemask=None, outputfile=None, quiet=False):
 				f.write(data)
 				if not quiet:
 					bar.update(i)
-				i += 1
+				i += chunk_size
 
 			if not quiet:
 				bar.finish()
