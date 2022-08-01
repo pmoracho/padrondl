@@ -142,7 +142,10 @@ def loginfo(msg):
 
 def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
+	loginfo(f"requests.get({pageurl})")
 	response = requests.get(pageurl)
+
+	loginfo(f"urlparse({pageurl})")
 	parsed_uri = urlparse(pageurl)
 
 	if domainoverride:
@@ -152,14 +155,16 @@ def get_UrlFromHref(pageurl, hreftext, domainoverride=None):
 
 	url = None
 	soup = BeautifulSoup(response.content, "html.parser")
+
 	for a in soup.find_all('a', href=True):
-		if a.string:
-			if hreftext in a.string:
+		if a.text:
+			if hreftext in a.text:
 				if "http" not in a["href"] and "/" in a["href"]:
 					url = domain + a['href']
 				elif "http" in a["href"]:
 					url = a["href"]
 
+	loginfo(f"Found url: {url}")
 	return url
 
 
@@ -357,6 +362,7 @@ def Main():
 				fileurl = url
 
 			if fileurl:
+				loginfo(f"Descargando {fileurl}")
 				try:
 					download_file(fileurl, filemask, outputpath, args.quiet)
 					pf.ok()
