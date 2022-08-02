@@ -3,7 +3,7 @@ Padrondl
 
 * [Página del proyecto](https://pmoracho.github.io/padrondl)
 * [Proyecto en github](https://github.com/pmoracho/padrondl)
-* [Descarga de ejecutable para windows](https://github.com/pmoracho/padrondl/raw/master/dist/padrondl-20161122.zip)
+* Descarga de ejecutable para windows: ir a `Releases`
 
 `Padrondl` es una herramienta de linea de comandos para descargar "padrones" de
 los organismos públicos. Los "padrones" son archivos en distintos formatos que
@@ -96,12 +96,7 @@ Como vemos, hay configurado cuatro padrones:
 # Requerimientos e instalación:
 
 En Windows, nada en particular ya que se distribuye la herramienta "congelada"
-mediante **Pyinstaller**. Descargarla y copiarla en alguna carpeta del sistema,
-idealmente que esté apuntada al path.
-
-* Para descargar *Padrondl**, ir a
-  [Releases](padrondl/releases)
-* El proyecto original en [**Github**](https://github.com/pmoracho/padrondl)
+mediante **Pyinstaller**. Descargarla desde los `Releases`.
 
 
 # Ejemplos de Uso:
@@ -176,10 +171,14 @@ herramienta.
 * Instalar requerimientos
 
 ```
+# Clonamos repo
 git clone <url_https_del_proyecto>
+
+# Creamos el entorno virtual
 cd <proyecto>
 python3 -m venv .venv --prompt=<proyecto>
 
+# Activamos entorno
 # En Windows
 .venv\Scripts\activate.bat
 
@@ -200,7 +199,8 @@ ejemplo: `padrondl`
 
 ## Despliegue
 
-Para instalar o desplegar la herramienta, usamos [`pyinstaller`][https://pyinstaller.org/en/stable/], instalarlo en el entorno virtual del proyecto mediante:
+Para instalar o desplegar la herramienta, usamos [`pyinstaller`][pyinstaller],
+instalarlo en el entorno virtual del proyecto mediante:
 
 ```
 pip install pyinstaller
@@ -229,3 +229,6 @@ pyinstaller padrondl.py --onefile --version-file version.txt
 #### Version 1.0 - 2016-11-22
 * Primera versión
 
+[git]: https://git-scm.com/
+[python]: https://www.python.org/
+[pyinstaller]: https://pyinstaller.org/en/stable/
