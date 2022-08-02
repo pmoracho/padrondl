@@ -17,7 +17,7 @@ link directo, más adelante iremos implementado en la medida de nuestras
 necesidades otros métodos para encontrar y descargar archivos desde un página
 web.
 
-La configuración de las decargas se realiza en un archivo de configuración 
+La configuración de las decargas se realiza en un archivo de configuración
 ubicado en la misma carpeta dónde se encuentra esta herramienta y que se
 denomina `padrondl.cfg`.
 
@@ -27,9 +27,9 @@ Esta es la configuación actual
 [padron:rgg]
 type		= href
 name		= Régimen general de ingresos brutos - CABA
-url 		= http://www.agip.gob.ar/agentes/agentes-de-recaudacion-e-informacion
+url 		= https://www.agip.gob.ar/agentes/agentes-de-recaudacion-e-informacion
 hreftext 	= Padrón de Regímenes Generales - Vigencia
-domain 		= http://www.agip.gob.ar/
+domain 		= https://www.agip.gob.ar/
 filemask	= ^\w*.rar
 
 [padron:cfsd]
@@ -49,7 +49,7 @@ hreftext 	= Archivo condición tributaria con denominación
 filemask	=
 
 [padron:2226]
-name		= Certificados de Exclusión Ret/Percep del Impuesto al Valor Agregado 
+name		= Certificados de Exclusión Ret/Percep del Impuesto al Valor Agregado
 type		= link
 domain 		= https://www.afip.gob.ar/genericos/rg17/
 url		 	= https://www.afip.gob.ar/genericos/rg17/archivos/rg17.zip
@@ -99,9 +99,9 @@ En Windows, nada en particular ya que se distribuye la herramienta "congelada"
 mediante **Pyinstaller**. Descargarla y copiarla en alguna carpeta del sistema,
 idealmente que esté apuntada al path.
 
-* Para descargar y descomprimir **Padrondl**, hacer click
-  [aqui](None)
-* El proyecto en [**Github**](https://github.com/pmoracho/padrondl)
+* Para descargar *Padrondl**, ir a
+  [Releases](padrondl/releases)
+* El proyecto original en [**Github**](https://github.com/pmoracho/padrondl)
 
 
 # Ejemplos de Uso:
@@ -130,7 +130,7 @@ argumentos opcionales:
                                            descargado.
 ```
 
-## `padrondl -s` 
+## `padrondl -s`
 
 Listar los padrones habilitados para descarga
 
@@ -156,57 +156,74 @@ Descargando ARDJU008112016.rar...
 
 # Notas para el desarrollador:
 
-El proyecto **padrondl** esta construido usando el lenguaje **python**, a la
-fecha no se usan librerías adicionales a las propias de python, pero de todas
-formas es recomendable preparar antes que nada, un entorno de desarrollo. A
-continuación expondremos en detalle cuales son los pasos para tener preparado
-el entorno de desarrollo. Este detalle esta orientado a la implementación sobre
-Windows 32 bits, los pasos para versiones de 64 bits son sustancialmente
-distintos, en particular por algunos de los "paquetes" que se construyen a
-partir de módulos en C o C++, de igual forma la instalación sobre Linux tiene
-sus grandes diferencias. Eventualmente profundizaremos sobre estos entornos,
-pero en principio volvemos a señalar que el siguiente detalle aplica a los
-ambientes Windows de 32 bits:
+## Requerimientos básicos:
 
-* Obviamente en primer lugar necesitaremos
-  [Python](https://www.python.org/ftp/python/3.4.0/python-3.4.0.msi), por ahora
-  únicamente la versión 3.4. La correcta instalación se debe verificar desde la
-  línea de comandos: `python --version`. Si todo se instaló correctamente se
-  debe ver algo como esto `Python 3.4.0`, sino verificar que Python.exe se
-  encuentre correctamente apuntado en el PATH.
+Tener instalado y funcionando:
 
-* Es conveniente pero no mandatorio hacer upgrade de la herramienta pip:
-  `python -m pip install --upgrade pip`
+* [Git][git]
+* [Python 3.x][python]
 
-* [Virutalenv](https://virtualenv.pypa.io/en/stable/). Es la herramienta
-  estándar para crear entornos "aislados" de python. Para no tener conflictos
-  de desarrollo lo que haremos mediante esta herramienta es crear un "entorno
-  virtual" de python en una carpeta del proyecto (venv). Este "entorno virtual"
-  contendrá una copia completa de Python, al activarlo se modifica el PATH al
-  python.exe que apuntará ahora a nuestra carpeta del entorno, evitando
-  cualquier tipo de conflicto con un entorno Python ya existente. La
-  instalación de virtualenv se hara mediante `pip install virtualenv`
+## Entorno inicial básico
 
-* Descargar el proyecto desde [Github](https://github.com/pmoracho/padrondl), se
-  puede descargar desde la página el proyecto como un archivo Zip, o si
-  contamos con [Git](https://git-for-windows.github.io/) sencillamente haremos
-  un `git clone https://github.com/pmoracho/parseit`.
+El primer paso es descargar el repositorio y preparar el entorno inicial que
+servirá tanto sea para desarrollo como para eventual ejecución de la
+herramienta.
 
-* Requerimientos adicionales:
+* Clonar repositorio
+* Crear entorno virtual
+* Activar entorno virtual
+* actualizar `pip` y `setuptool`
+* Instalar requerimientos
 
-	* **Pyinstaller**, para generar la distribución binaria `pip install pyinstaller`
-	* **Requests** --> `pip install requests`
-	* **BeautifulSoup** --> `pip install beautifulsoup4`
-	* **Progressbar** --> `pip install progressbar2`
+```
+git clone <url_https_del_proyecto>
+cd <proyecto>
+python3 -m venv .venv --prompt=<proyecto>
 
-	Se puede instalar todo lo necesario mediante: `pip insatall -r requirements.txt`
+# En Windows
+.venv\Scripts\activate.bat
+
+# En Linux
+source .venv/bin/activate
+
+# Actualizar pip y setuptools
+python -m pip install --upgrade pip
+pip install --upgrade setuptools
+
+# Instalar  paquetes requeridos
+pip install -r requirements.txt
+```
+
+**Nota**: reemplazar `<url_https_del_proyecto>` por la dirección url que nos da
+`github` para este repositorio y `<proyecto>` por el nombre del repositorio,
+ejemplo: `padrondl`
+
+## Despliegue
+
+Para instalar o desplegar la herramienta, usamos [`pyinstaller`][https://pyinstaller.org/en/stable/], instalarlo en el entorno virtual del proyecto mediante:
+
+```
+pip install pyinstaller
+```
+
+Luego, para generar el ejecutable:
+
+```
+pyinstaller padrondl.py --onefile --version-file version.txt
+```
 
 # Changelog:
+
+#### Version 1.2.0 - 2022-08-02
+
+* Update a **Python 3.10** y actualización de librerías
+* Fix por cambio en página del Agip
+* Eliminamos carpeta `dist` y creamos `version.txt`
 
 #### Version 1.1 - 2017-07-16
 * Descarga por link directo
 * Output path configurable medainte parámetro `--output-path -o`
-* Log 
+* Log
 * Generación de "Flag File" por padrón.
 
 #### Version 1.0 - 2016-11-22
