@@ -10,7 +10,9 @@ name: Build Python Exes
 
 on:
   push:
-
+    tags:
+      - 'v*'
+      
 jobs:
 
   pyinstaller-win-build:
