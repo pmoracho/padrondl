@@ -61,6 +61,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: Release ${{ env.TAG_NAME }}
+          body_path: RELEASE.md
           draft: false
 
       - name: Upload release asset
@@ -69,17 +70,15 @@ jobs:
           TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          artifact_path: ${{ steps.pyinstaller-win-build.outputs.artifact_path }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # Agrega los artifacts generados como archivos adjuntos al release
           asset_path: |
-            ./dist/padrondl-linux.zip
             ./dist/padrondl-win.zip
             ./padrondl.cfg
           asset_name: |
-            padrondl-linux.zip
             padrondl-win.zip
             padrondel.cfg
           asset_content_type: |
-            application/zip
             application/zip
             text/plain

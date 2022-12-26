@@ -1,0 +1,3 @@
+- Esta es la versión de 2/8/2022 que es la primera que se publica como release.
+- Se ha actualizado el proyecto a Python 3.10.
+- Se corresponde con el commit: https://github.com/pmoracho/padrondl/commit/83b9d02a9fe894324631b72f96df1e54c02ad992
