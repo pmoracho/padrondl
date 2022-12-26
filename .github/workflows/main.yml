@@ -61,7 +61,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: Release ${{ env.TAG_NAME }}
-          body_path: RELEASE.md
+          body_path: ./RELEASE.md
           draft: false
 
       - name: Upload release asset
