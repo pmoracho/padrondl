@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build Python Exes
+name: Create a new Release
 
 on:
   push:
@@ -70,14 +70,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.create_release.outputs.id }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           # Agrega los artifacts generados como archivos adjuntos al release
           asset_paths: |
-            padrondl-linux.zip
-            padrondl-win.zip
+            ./dist/padrondl-linux.zip
+            ./dist/padrondl-win.zip
           asset_names: |
             padrondl-linux.zip
             padrondl-win.zip
           asset_content_types: |
             application/zip
             application/zip
-
