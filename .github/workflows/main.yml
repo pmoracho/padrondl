@@ -72,7 +72,7 @@ jobs:
           release_id: ${{ steps.create_release.outputs.id }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # Agrega los artifacts generados como archivos adjuntos al release
-          asset_paths: |
+          asset_path: |
             ./dist/padrondl-linux.zip
             ./dist/padrondl-win.zip
             ./padrondl.cfg
