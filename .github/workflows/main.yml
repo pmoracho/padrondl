@@ -48,7 +48,6 @@ jobs:
     steps:
       - name: Get commit tag
         id: get_tag
-        uses: actions/checkout@v2
         run:  echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
       - name: Create Release
