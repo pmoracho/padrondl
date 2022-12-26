@@ -11,7 +11,8 @@ name: Build Python Exes
 on:
   push:
     branches: [ master ]
-
+    tags:
+      - 'v*'
 jobs:
   pyinstaller-win-build:
     runs-on: windows-latest
