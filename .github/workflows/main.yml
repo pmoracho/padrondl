@@ -53,6 +53,7 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         id: create_release
+        needs: get_tag
         env:
           TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,6 +63,15 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           release_name: Release ${{ env.TAG_NAME }}
           draft: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        needs: create_release
+        env:
+          TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
           # Agrega los artifacts generados como archivos adjuntos al release
           asset_paths: |
             padrondl-linux.zip
@@ -72,3 +82,4 @@ jobs:
           asset_content_types: |
             application/zip
             application/zip
+
