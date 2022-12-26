@@ -28,10 +28,6 @@ jobs:
   pyinstaller-linux-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Get commit tag
-        run: echo ::set-env name=TAG_NAME::$(git describe --exact-match HEAD)
-        id: get_tag
-
       - name: Create Linux Executable
         uses: sayyid5416/pyinstaller@v1
         with:
