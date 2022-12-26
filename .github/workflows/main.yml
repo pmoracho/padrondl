@@ -69,18 +69,17 @@ jobs:
           TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_id: ${{ steps.create_release.outputs.id }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # Agrega los artifacts generados como archivos adjuntos al release
           asset_path: |
             ./dist/padrondl-linux.zip
             ./dist/padrondl-win.zip
             ./padrondl.cfg
-          asset_names: |
+          asset_name: |
             padrondl-linux.zip
             padrondl-win.zip
             padrondel.cfg
-          asset_content_types: |
+          asset_content_type: |
             application/zip
             application/zip
             text/plain
