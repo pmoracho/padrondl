@@ -53,7 +53,6 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         id: create_release
-        needs: get_tag
         env:
           TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,7 +65,6 @@ jobs:
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
-        needs: create_release
         env:
           TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
