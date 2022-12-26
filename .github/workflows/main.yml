@@ -13,6 +13,7 @@ on:
     tags:
       - 'v*'
 jobs:
+
   pyinstaller-win-build:
     runs-on: windows-latest
     steps:
@@ -28,6 +29,10 @@ jobs:
   pyinstaller-linux-build:
     runs-on: ubuntu-latest
     steps:
+      - name: Get commit tag
+        run: echo ::set-env name=TAG_NAME::$(git describe --exact-match HEAD)
+        id: get_tag
+
       - name: Create Linux Executable
         uses: sayyid5416/pyinstaller@v1
         with:
@@ -36,3 +41,18 @@ jobs:
           requirements: 'requirements.txt'
           exe_path: ./dist/linux
           upload_exe_with_name: 'padrondl-linux'
+          
+          
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get commit tag
+        run: echo ::set-env name=TAG_NAME::$(git describe --exact-match HEAD)
+        id: get_tag
+        
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: env.TAG_NAME != ''
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }}
