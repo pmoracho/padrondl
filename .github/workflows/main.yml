@@ -47,12 +47,13 @@ jobs:
       - pyinstaller-linux-build
     steps:
       - name: Get commit tag
-        run: echo ::set-env name=TAG_NAME::$(git describe --exact-match HEAD)
+        run:  echo "TAG_NAME=$(git describe --exact-match HEAD)" >> $GITHUB_ENV
         id: get_tag
         
       - name: Create Release
         uses: actions/create-release@v1
         id: create_release
+        
         if: env.TAG_NAME != ''
         with:
           tag_name: ${{ env.TAG_NAME }}
