@@ -10,7 +10,6 @@ name: Build Python Exes
 
 on:
   push:
-    branches: [ master ]
     tags:
       - 'v*'
 jobs:
