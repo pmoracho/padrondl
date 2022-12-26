@@ -54,9 +54,9 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         env:
-          TAG_NAME: ${{ steps.vaget_tagrs.outputs.TAG_NAME }}
+          TAG_NAME: ${{ steps.get_tag.outputs.TAG_NAME }}
 
-        if: env.TAG_NAME != ''
+        if: ${{ env.TAG_NAME != ''}}
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: Release ${{ env.TAG_NAME }}
