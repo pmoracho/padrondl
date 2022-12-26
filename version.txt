@@ -31,12 +31,12 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u'Marval O''farrell Mairal'),
         StringStruct(u'FileDescription', u'Downloader de padrones fiscales'),
-        StringStruct(u'FileVersion', u'1.2.1'),
+        StringStruct(u'FileVersion', u'1.2.2'),
         StringStruct(u'InternalName', u'padrondl'),
         StringStruct(u'LegalCopyright', u'\xa9 Marval O''farrell Mairal. All rights reserved.'),
         StringStruct(u'OriginalFilename', u'padrondl.exe'),
         StringStruct(u'ProductName', u'Downloader de padrones fiscales'),
-        StringStruct(u'ProductVersion', u'1.2.1')])
+        StringStruct(u'ProductVersion', u'1.2.2')])
      ]),
      VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
