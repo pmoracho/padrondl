@@ -13,47 +13,14 @@ on:
     branches: [ master ]
 
 jobs:
-  build_linux:
-    runs-on: ubuntu-20.04
+  pyinstaller-build:
+    runs-on: windows-latest>
     steps:
-    - uses: actions/checkout@v2
-    - name: Build Python Exe
-      uses: sayyid5416/pyinstaller@v1
-      with:
-        main: main
-        artifact: Program
-        use-dependencies: false
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: padrondl
-        exe_path: ./dist
-        python_ver: '3.9'
-        spec: ./build.spec
-        requirements: ./requirements.txt
-        upload_exe_with_name: 'padrondl'
-        options: --onefile, --name "padrondl",     
-        
-  build_windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Test Build Python Exe
+      - name: Create Executable
         uses: sayyid5416/pyinstaller@v1
         with:
-          main: main
-          artifact: Program
-          use-dependencies: false
-          exe_path: ./dist
           python_ver: '3.9'
-          spec: ./build.spec
-          requirements: ./requirements.txt
+          spec: 'build.spec'
+          requirements: 'requirements.txt'
           upload_exe_with_name: 'padrondl'
-          options: --onefile, --name "padrondl",           
-          
-          
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: padrondl
-          path: dist
+          options: --onefile, --name "padrondl", 
