@@ -28,6 +28,11 @@ jobs:
       with:
         name: padrondl
         path: dist
+        python_ver: '3.9'
+        spec: 'build.spec'
+        requirements: 'requirements.txt'
+        upload_exe_with_name: 'pdrondl'
+        options: --onefile, --name "padrondl",     
         
   build_windows:
     runs-on: windows-latest
@@ -39,6 +44,13 @@ jobs:
           main: main
           artifact: Program
           use-dependencies: false
+          python_ver: '3.9'
+          spec: 'build.spec'
+          requirements: 'requirements.txt'
+          upload_exe_with_name: 'pdrondl'
+          options: --onefile, --name "padrondl",           
+          
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
